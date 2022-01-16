@@ -45,7 +45,43 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+//Event listener for the <p> tag that changes the element to a textArea
+$(".list-group").on("click", "p", function() {
+  var text = $(this).text().trim();
 
+  var textInput = $("<textarea>")
+    .addClass("form-control")
+    .val(text);
+  $(this).replaceWith(textInput);
+
+  textInput.trigger("focus");
+
+});
+
+//Event listener that triggers on blur, or when the target is unfocused, changing back to <p>
+$(".list-group").on("blur", "textarea", function() {
+  //Get the textValue of the element
+  var text = $(this).val().trim();
+
+  //Get parent <ul> element id
+  var status = $(this).closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+
+  //get task position in the list of other <li> elements
+  console.log(status);
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+  tasks[status][index].text = text;
+  saveTasks();
+
+  //recreate and load the p element
+  var taskP = $("<p>").addClass("m-1").text(text);
+  $(this).replaceWith(taskP);
+
+});
 
 
 // modal was triggered
