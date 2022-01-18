@@ -14,5 +14,8 @@ In the Pro edition, Taskmaster shows color-coded styles that are applied to the 
 * Moment.js
 * Google Fonts - Open Sans, Staatliches
 
+## Deployed Link:
+https://lumberjon1.github.io/Taskmaster-Pro/
+
 ## Author
 Jonathan Williams, 2022
