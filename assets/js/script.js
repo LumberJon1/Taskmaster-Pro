@@ -124,7 +124,47 @@ $(".list-group").on("blur", "input[type='text']", function() {
   $(this).replaceWith(taskSpan);
 });
 
+//Make cards sortable
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function(event) {
+    console.log("activate", this);
+  },
+  deactivate: function(event) {
+    console.log("deactivate", this);
+  },
+  over: function(event) {
+    console.log("over", event.target);
+  },
+  out: function(event) {
+    console.log("out", event.target);
+  },
+  update: function(event) {
+    var tempArr = [];
 
+    //Find the text values of the date and task name for each list item
+    $(this).children().each(function() {
+      var text = $(this).find("p").text().trim();
+      var date = $(this).find("span").text().trim();
+
+      //Add those values to a temporary array
+      tempArr.push({
+        text: text,
+        date: date
+      });
+    });
+
+    //Find the list within the global tasks array to save the updates to
+    var arrName = $(this).attr("id").replace("list-", "");
+
+    //Replace values in global array with the temporary array values and save tasks
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -171,5 +211,3 @@ $("#remove-tasks").on("click", function() {
 
 // load tasks for the first time
 loadTasks();
-
-
