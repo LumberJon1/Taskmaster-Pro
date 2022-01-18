@@ -1,5 +1,24 @@
 var tasks = {};
 
+var auditTasks = function(taskEl) {
+  date = $(taskEl).find("span").text().trim();
+
+  //Convert date to a moment.js object
+  var time = moment(date, "L").set("hour", 17);
+
+  //Remove any previously-applied styles
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  //Apply a new class if the task is approaching due or overdue
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  //Check if we are within 2 days of the task due date and apply warning styling.
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
+
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
@@ -13,6 +32,8 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  //Check dueDate
+  auditTasks(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -95,12 +116,20 @@ $(".list-group").on("click", "span", function() {
   //swap elements
   $(this).replaceWith(dateInput);
 
+  //Enable jQuery UI Datepicker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      $(this).trigger("change");
+    }
+  });
+
   //Focus on new element
   dateInput.trigger("focus");
 });
 
-//Event listener to handle blur of date form
-$(".list-group").on("blur", "input[type='text']", function() {
+//Event listener to handle change of date form
+$(".list-group").on("change", "input[type='text']", function() {
   //get current text
   var date = $(this).val().trim();
 
@@ -122,6 +151,9 @@ $(".list-group").on("blur", "input[type='text']", function() {
 
   //replace input with span
   $(this).replaceWith(taskSpan);
+
+  //Pass the task li element into the auditTask function and apply any new styles
+  auditTasks($(taskSpan).closest(".list-group-item"));
 });
 
 //Make cards sortable
@@ -213,6 +245,10 @@ $("#task-form-modal .btn-primary").click(function() {
 
     saveTasks();
   }
+});
+
+$("#modalDueDate").datepicker({
+  minDate: 1
 });
 
 // remove all tasks
